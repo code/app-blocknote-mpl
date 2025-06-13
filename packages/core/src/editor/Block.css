@@ -15,18 +15,9 @@ BASIC STYLES
 
 .bn-block-content {
   padding: 3px 0;
+  display: flex;
   transition: font-size 0.2s;
   width: 100%;
-  /*
-  because the content elements are display: block
-  we use flex to position them next to list markers
-  */
-}
-
-.bn-block-content::before {
-  /* content: ""; */
-  transition: all 0.2s;
-  /*margin: 0px;*/
 }
 
 .bn-block-content.ProseMirror-selectednode > *,
@@ -34,6 +25,19 @@ BASIC STYLES
 .ProseMirror-selectednode > .bn-block-content > * {
   border-radius: 4px;
   outline: 4px solid rgb(100, 160, 255);
+}
+
+.bn-block-content::before {
+  content: "";
+  margin-right: 0;
+  transition: all 0.2s;
+  /* Workaround for selection issue on Chrome, see #1588 and also here:
+  https://discuss.prosemirror.net/t/mouse-down-selection-behaviour-different-on-chrome/8426
+  The :before element causes the selection to be set in the wrong place vs 
+  other browsers. Setting no height fixes this, while list item indicators are 
+  still displayed fine as overflow is not hidden. */
+  height: 0;
+  overflow: visible;
 }
 
 .bn-inline-content {
@@ -144,6 +148,11 @@ NESTED BLOCKS
 
 .bn-block-outer:not([data-prev-type])
   > .bn-block
+  > .bn-block-content[data-content-type="heading"],
+.bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > div[data-type="modification"]
+  > div[data-type="modification"]
   > .bn-block-content[data-content-type="heading"] {
   font-size: var(--level);
   font-weight: bold;
@@ -162,7 +171,6 @@ NESTED BLOCKS
 .bn-block-content::before {
   margin-right: 0;
   content: "";
-  display: inline;
 }
 
 /* Ordered */
@@ -187,6 +195,10 @@ NESTED BLOCKS
 
 .bn-block-outer:not([data-prev-type])
   > .bn-block
+  > .bn-block-content[data-content-type="numberedListItem"]::before,
+.bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > div[data-type="modification"]
   > .bn-block-content[data-content-type="numberedListItem"]::before {
   content: var(--index) ".";
 }
@@ -231,6 +243,10 @@ NESTED BLOCKS
 
 .bn-block-outer:not([data-prev-type])
   > .bn-block
+  > .bn-block-content[data-content-type="bulletListItem"]::before,
+.bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > div[data-type="modification"]
   > .bn-block-content[data-content-type="bulletListItem"]::before {
   content: "•";
 }
@@ -248,6 +264,12 @@ NESTED BLOCKS
   ~ .bn-block-group
   > .bn-block-outer:not([data-prev-type])
   > .bn-block
+  > .bn-block-content[data-content-type="bulletListItem"]::before,
+[data-content-type="bulletListItem"]
+  ~ .bn-block-group
+  > .bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > div[data-type="modification"]
   > .bn-block-content[data-content-type="bulletListItem"]::before {
   content: "◦";
 }
@@ -269,6 +291,14 @@ NESTED BLOCKS
   ~ .bn-block-group
   > .bn-block-outer:not([data-prev-type])
   > .bn-block
+  > .bn-block-content[data-content-type="bulletListItem"]::before,
+[data-content-type="bulletListItem"]
+  ~ .bn-block-group
+  [data-content-type="bulletListItem"]
+  ~ .bn-block-group
+  > .bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > div[data-type="modification"]
   > .bn-block-content[data-content-type="bulletListItem"]::before {
   content: "▪";
 }
@@ -434,7 +464,6 @@ NESTED BLOCKS
   position: absolute;
   font-style: italic;
 }
-
 /* TODO: should this be here? */
 
 /* TEXT COLORS */
